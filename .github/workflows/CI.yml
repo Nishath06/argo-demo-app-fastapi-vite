@@ -161,7 +161,7 @@ jobs:
           scanners: vuln
           severity: HIGH,CRITICAL
           ignore-unfixed: true
-          trivy-config: .trivy.yaml
+          trivy-config: .trivy.yml
           exit-code: 1
           skip-setup-trivy: false
         env:
