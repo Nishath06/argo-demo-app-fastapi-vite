@@ -156,11 +156,11 @@ jobs:
       - name: Stage 10 — Trivy Scan Backend Image
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: "${{ env.BACKEND_IMAGE }}:${{ env.IMAGE_TAG }}"
-          format: "table"
-          exit-code: "1"
-          severity: "HIGH,CRITICAL"
-          ignore-unfixed: false
+          image-ref: ${{ env.BACKEND_IMAGE }}:${{ env.IMAGE_TAG }}
+          format: table
+          exit-code: 1
+          severity: HIGH,CRITICAL
+          ignorefile: .trivyignore
 
       # ========================================================================
       # Stage 11 — Trivy Scan Frontend Image
