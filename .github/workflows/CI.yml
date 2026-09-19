@@ -16,8 +16,8 @@ env:
   AWS_REGION: ap-south-1
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
-  BACKEND_IMAGE: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/devops-starter-kit-backend
-  FRONTEND_IMAGE: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/devops-starter-kit-frontend
+  BACKEND_IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/devops-starter-kit-backend
+  FRONTEND_IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/devops-starter-kit-frontend
 
   GITOPS_REPO: Nishath06/argo-demo-app-fastapi-vite-infra
   BACKEND_MANIFEST: apps/backend/deployment.yaml
