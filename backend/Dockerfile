@@ -18,21 +18,33 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy dependency file first (better Docker layer caching)
 COPY requirements.txt .
 
-# Upgrade pip + packaging tools BEFORE requirements (bootstrap)
-RUN pip install --no-cache-dir --upgrade pip setuptools==78.1.1 wheel
+# Step 1 — Bootstrap: upgrade pip + all packaging tools to safe versions first
+RUN pip install --no-cache-dir --upgrade \
+    "pip" \
+    "setuptools==78.1.1" \
+    "wheel==0.46.2" \
+    "jaraco.context==6.1.0"
 
-# Install application dependencies
+# Step 2 — Install all application dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Force-remove every stale/bundled copy of setuptools that Trivy may detect:
-#   1. ensurepip bundled wheels (ships with python:3.12-slim, contains old setuptools)
-#   2. Any leftover dist-info folders for setuptools < 78.x
+# Step 3 — Force-re-pin all CVE-affected packages AFTER requirements install.
+#           This ensures no transitive dependency resolution can downgrade them.
+RUN pip install --no-cache-dir --force-reinstall \
+    "setuptools==78.1.1" \
+    "wheel==0.46.2" \
+    "jaraco.context==6.1.0" \
+    "msgpack==1.2.1"
+
+# Step 4 — Wipe every stale bundled setuptools/wheel copy that Trivy scans:
+#   - ensurepip/_bundled/ ships old .whl files with the base image
+#   - Any leftover dist-info for packages below the fixed versions
 RUN rm -rf /usr/local/lib/python3.12/ensurepip/_bundled && \
-    find /usr/local/lib/python3.12 -maxdepth 2 \
-         -name "setuptools-*.dist-info" \
-         ! -name "setuptools-78*" \
-         -exec rm -rf {} + 2>/dev/null || true && \
-    pip install --no-cache-dir --upgrade setuptools==78.1.1
+    find /usr/local/lib/python3.12/site-packages -maxdepth 1 \
+         \( -name "setuptools-*.dist-info" ! -name "setuptools-78*" \
+         -o -name "wheel-*.dist-info"     ! -name "wheel-0.46*"    \
+         -o -name "msgpack-*.dist-info"   ! -name "msgpack-1.2*"   \
+         \) -exec rm -rf {} + 2>/dev/null || true
 
 # Create non-root user
 RUN groupadd --gid 1001 appgroup && \

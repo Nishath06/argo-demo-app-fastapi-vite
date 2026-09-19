@@ -8,5 +8,9 @@ pyjwt[crypto]>=2.9.0
 bcrypt>=4.0.1
 prometheus-fastapi-instrumentator>=7.0.0
 python-multipart>=0.0.9
-msgpack>=1.2.1
-setuptools>=78.1.1
+
+# Security: pinned to fix known CVEs detected by Trivy
+msgpack>=1.2.1          # GHSA-6v7p-g79w-8964 (was 1.1.2)
+setuptools>=78.1.1      # CVE-2025-47273      (was 70.3.0)
+wheel>=0.46.2           # CVE-2026-24049      (was 0.45.1)
+jaraco.context>=6.1.0   # CVE-2026-23949      (was 5.3.0, transitive dep of setuptools)
