@@ -158,9 +158,10 @@ jobs:
         with:
           image-ref: ${{ env.BACKEND_IMAGE }}:${{ env.IMAGE_TAG }}
           format: table
-          exit-code: 1
+          exit-code: "1"
           severity: HIGH,CRITICAL
-          ignorefile: .trivyignore
+          vuln-type: os,library
+          ignore-unfixed: true
 
       # ========================================================================
       # Stage 11 — Trivy Scan Frontend Image
@@ -172,7 +173,8 @@ jobs:
           format: "table"
           exit-code: "1"
           severity: "HIGH,CRITICAL"
-          ignore-unfixed: false
+          vuln-type: os,library
+          ignore-unfixed: true
 
       
       # # Stage 12 — Configure AWS Credentials

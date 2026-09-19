@@ -18,10 +18,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy dependency file first (better Docker layer caching)
 COPY requirements.txt .
 
-# Upgrade packaging tools (fixes Trivy vulnerabilities)
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir --upgrade -r requirements.txt && \
-    rm -rf /usr/local/lib/python3.12/ensurepip/_bundled
+# Upgrade pip + packaging tools BEFORE requirements (bootstrap)
+RUN pip install --no-cache-dir --upgrade pip setuptools==78.1.1 wheel
+
+# Install application dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Force-remove every stale/bundled copy of setuptools that Trivy may detect:
+#   1. ensurepip bundled wheels (ships with python:3.12-slim, contains old setuptools)
+#   2. Any leftover dist-info folders for setuptools < 78.x
+RUN rm -rf /usr/local/lib/python3.12/ensurepip/_bundled && \
+    find /usr/local/lib/python3.12 -maxdepth 2 \
+         -name "setuptools-*.dist-info" \
+         ! -name "setuptools-78*" \
+         -exec rm -rf {} + 2>/dev/null || true && \
+    pip install --no-cache-dir --upgrade setuptools==78.1.1
 
 # Create non-root user
 RUN groupadd --gid 1001 appgroup && \
