@@ -158,11 +158,15 @@ jobs:
         with:
           image-ref: ${{ env.BACKEND_IMAGE }}:${{ env.IMAGE_TAG }}
           format: table
-          exit-code: "1"
+          scanners: vuln
           severity: HIGH,CRITICAL
-          vuln-type: os,library
           ignore-unfixed: true
-          ignorefile: .trivyignore
+          trivy-config: .trivy.yaml
+          exit-code: 1
+          skip-setup-trivy: false
+        env:
+          TRIVY_CACHE_DIR: /tmp/trivy-cache-${{ github.sha }}
+          TRIVY_NO_PROGRESS: "true"
 
       # ========================================================================
       # Stage 11 — Trivy Scan Frontend Image

@@ -1,0 +1,19 @@
+scan:
+  scanners:
+    - vuln
+
+format: table
+severity:
+  - HIGH
+  - CRITICAL
+
+vulnerability:
+  ignore-unfixed: true
+  type:
+    - os
+    - library
+
+# .trivyignore suppresses false positives from pip's internally vendored packages
+ignorefile: .trivyignore
+
+exit-code: 1
