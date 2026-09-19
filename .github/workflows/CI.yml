@@ -92,7 +92,54 @@ jobs:
         uses: actions/setup-node@v4
         with:
         node-version: "22"
-        cache: "npm"
+        cache:  # ========================================================================
+      # Stage 5 — Setup Node.js (LTS 22)
+      # ========================================================================
+      - name: Stage 5 — Setup Node.js (LTS 22)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: "frontend/package-lock.json"
+
+      # ========================================================================
+      # Stage 6 — Install Frontend Dependencies
+      # ========================================================================
+      - name: Stage 6 — Install Frontend Dependencies
+        working-directory: frontend
+        run: |
+          echo "Installing npm dependencies for React frontend..."
+          npm ci
+
+      # ========================================================================
+      # Stage 7 — Build Frontend
+      # ========================================================================
+      - name: Stage 7 — Build Frontend
+        working-directory: frontend
+        run: |
+          echo "Building React frontend with Vite..."
+          npm run build
+          
+        cache-dependency-path: "frontend/package-lock.json"
+
+      # ========================================================================
+      # Stage 6 — Install Frontend Dependencies
+      # ========================================================================
+      - name: Stage 6 — Install Frontend Dependencies
+        working-directory: frontend
+        run: |
+          echo "Installing npm dependencies for React frontend..."
+          npm ci
+
+      # ========================================================================
+      # Stage 7 — Build Frontend
+      # ========================================================================
+      - name: Stage 7 — Build Frontend
+        working-directory: frontend
+        run: |
+          echo "Building React frontend with Vite..."
+          npm run build
+          "npm"
         cache-dependency-path: "frontend/package-lock.json"
 
       # ========================================================================
