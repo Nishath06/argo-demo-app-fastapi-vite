@@ -1,0 +1,25 @@
+# .trivyignore — Trivy CVE exceptions
+# Format: one CVE/GHSA ID per line (optionally with expiry: id exp:YYYY-MM-DD)
+#
+# HOW TO USE:
+#   trivy image --ignorefile .trivyignore <image>
+#
+# POLICY: Only add an entry here when the vulnerable code is:
+#   (a) vendored INSIDE a tool (not callable from app code), AND
+#   (b) a fixed package version is already installed in site-packages
+#
+# Review and remove entries as upstream packages ship fixes.
+# ──────────────────────────────────────────────────────────────────────────────
+
+# jaraco.context — vendored inside setuptools/_vendor/jaraco/
+# The app never calls jaraco.context directly; it is only used internally
+# by setuptools during package management operations (not at runtime).
+# Fixed version (6.1.0) is installed in site-packages.
+# CVE: https://avd.aquasec.com/nvd/cve-2026-23949
+CVE-2026-23949
+
+# wheel — METADATA found inside pip/setuptools bundled .whl archives.
+# wheel is a build tool; it is not imported or used at application runtime.
+# Fixed version (0.46.2) is installed in site-packages.
+# CVE: https://avd.aquasec.com/nvd/cve-2026-24049
+CVE-2026-24049

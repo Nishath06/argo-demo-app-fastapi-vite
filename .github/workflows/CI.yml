@@ -162,6 +162,7 @@ jobs:
           severity: HIGH,CRITICAL
           vuln-type: os,library
           ignore-unfixed: true
+          ignorefile: .trivyignore
 
       # ========================================================================
       # Stage 11 — Trivy Scan Frontend Image
@@ -175,6 +176,7 @@ jobs:
           severity: "HIGH,CRITICAL"
           vuln-type: os,library
           ignore-unfixed: true
+          ignorefile: .trivyignore
 
       
       # # Stage 12 — Configure AWS Credentials
