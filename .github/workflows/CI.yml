@@ -13,21 +13,21 @@ on:
 env:
   
   #for AWS ECR, uncomment the following lines and set your AWS_ACCOUNT_ID and AWS_REGION in GitHub Secrets
-  
   AWS_REGION: ap-south-1
-  
-  BACKEND_IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/devops-starter-kit-backend
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
-  FRONTEND_IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/devops-starter-kit-frontend
-  GITOPS_REPO: "Nishath06/argo-demo-app-fastapi-vite-infra"
-  BACKEND_MANIFEST: "apps/backend/deployment.yaml"
-  FRONTEND_MANIFEST: "apps/frontend/deployment.yaml"
-  BASE_BRANCH: "main"
+  BACKEND_IMAGE: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/devops-starter-kit-backend
+  FRONTEND_IMAGE: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/devops-starter-kit-frontend
 
+  GITOPS_REPO: Nishath06/argo-demo-app-fastapi-vite-infra
+  BACKEND_MANIFEST: apps/backend/deployment.yaml
+  FRONTEND_MANIFEST: apps/frontend/deployment.yaml
+  BASE_BRANCH: main
 jobs:
   pipeline:
     name: Build, Test & GitOps Delivery
     runs-on: ubuntu-latest
+    environment: "DevOps starter kit testing"
 
     steps:
       # ========================================================================
