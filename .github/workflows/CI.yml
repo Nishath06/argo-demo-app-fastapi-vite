@@ -19,7 +19,7 @@ env:
   BACKEND_IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/devops-starter-kit-backend
 
   FRONTEND_IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/devops-starter-kit-frontend
-  GITOPS_REPO: "Nishath06/devops-starter-kit-infrastructure"
+  GITOPS_REPO: "Nishath06/argo-demo-app-fastapi-vite-infra"
   BACKEND_MANIFEST: "apps/backend/deployment.yaml"
   FRONTEND_MANIFEST: "apps/frontend/deployment.yaml"
   BASE_BRANCH: "main"
@@ -201,10 +201,9 @@ jobs:
       - name: Stage 15 — Push Frontend Image to Amazon ECR
         if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         run: |
-        echo "Pushing frontend image to Amazon ECR..."
-
-        docker push "${{ env.FRONTEND_IMAGE }}:${{ env.IMAGE_TAG }}"
-        docker push "${{ env.FRONTEND_IMAGE }}:latest"
+          echo "Pushing frontend image to Amazon ECR..."
+          docker push "${{ env.FRONTEND_IMAGE }}:${{ env.IMAGE_TAG }}"
+          docker push "${{ env.FRONTEND_IMAGE }}:latest"
 
 
       # # ========================================================================
