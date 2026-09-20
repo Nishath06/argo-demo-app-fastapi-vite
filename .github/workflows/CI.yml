@@ -418,6 +418,6 @@ jobs:
       # ========================================================================
       # Stage 25 — Stop
       # ========================================================================
-      - name: Stage 24 — Stop
+      - name: Stage 25 — Stop
         run: |
           echo "CI/CD completed successfully. CI stops after PR creation; ArgoCD handles cluster deployment."
