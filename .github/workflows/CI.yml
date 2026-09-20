@@ -288,56 +288,39 @@ jobs:
       # Stage 19 — Update Backend Deployment Manifest
       # ========================================================================
       - name: Stage 19 — Update Backend Deployment Manifest
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         working-directory: infra-repo
         env:
           BACKEND_IMAGE: ${{ env.BACKEND_IMAGE }}
           IMAGE_TAG: ${{ env.IMAGE_TAG }}
         run: |
-          echo "Updating backend deployment (${{ env.BACKEND_MANIFEST }}) with image ${{ env.BACKEND_IMAGE }}:${{ env.IMAGE_TAG }}..."
+          echo "Updating backend deployment..."
+
           yq -i '
-          .spec.template.spec.containers =
-          (
-            .spec.template.spec.containers
-            | map(
-                if .name == "backend"
-                then .image = (env(BACKEND_IMAGE) + ":" + env(IMAGE_TAG))
-                else .
-                end
-              )
-          )
+            (.spec.template.spec.containers[] | select(.name == "backend")).image =
+            strenv(BACKEND_IMAGE) + ":" + strenv(IMAGE_TAG)
           ' "${{ env.BACKEND_MANIFEST }}"
 
-          echo "--- Git Diff (${{ env.BACKEND_MANIFEST }}) ---"
           git diff "${{ env.BACKEND_MANIFEST }}"
 
       # ========================================================================
       # Stage 20 — Update Frontend Deployment Manifest
       # ========================================================================
       - name: Stage 20 — Update Frontend Deployment Manifest
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         working-directory: infra-repo
         env:
           FRONTEND_IMAGE: ${{ env.FRONTEND_IMAGE }}
           IMAGE_TAG: ${{ env.IMAGE_TAG }}
         run: |
-          echo "Updating frontend deployment (${{ env.FRONTEND_MANIFEST }}) with image ${{ env.FRONTEND_IMAGE }}:${{ env.IMAGE_TAG }}..."
-          yq -i '
-          .spec.template.spec.containers =
-          (
-            .spec.template.spec.containers
-            | map(
-                if .name == "frontend"
-                then .image = (env(FRONTEND_IMAGE) + ":" + env(IMAGE_TAG))
-                else .
-                end
-              )
-          )
-          ' "${{ env.FRONTEND_MANIFEST }}"
+            echo "Updating frontend deployment..."
 
-          echo "--- Git Diff (${{ env.FRONTEND_MANIFEST }}) ---"
-          git diff "${{ env.FRONTEND_MANIFEST }}"
+            yq -i '
+              (.spec.template.spec.containers[] | select(.name == "frontend")).image =
+              strenv(FRONTEND_IMAGE) + ":" + strenv(IMAGE_TAG)
+            ' "${{ env.FRONTEND_MANIFEST }}"
 
+            git diff "${{ env.FRONTEND_MANIFEST }}"
       # ========================================================================
       # Stage 21 — Commit both manifest changes
       # ========================================================================
