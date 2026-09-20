@@ -358,7 +358,7 @@ jobs:
 
           git remote set-url origin \
           "https://x-access-token:${GH_PAT}@github.com/${{ env.GITOPS_REPO }}.git"
-  
+
           git push origin "${BRANCH_NAME}" --force
 
       # ========================================================================
@@ -392,7 +392,31 @@ jobs:
           fi
 
       # ========================================================================
-      # Stage 24 — Stop
+      # Stage 24 — auto merge PR
+      # ========================================================================
+      - name: Stage 24 — Enable Auto Merge PR
+        if: env.CHANGES_COMMITTED == 'true'
+        working-directory: infra-repo
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+            BRANCH_NAME="update/image-${{ env.IMAGE_TAG }}"
+
+              PR_NUMBER=$(gh pr list \
+              --repo "${{ env.GITOPS_REPO }}" \
+              --head "${BRANCH_NAME}" \
+              --json number \
+              --jq '.[0].number')
+
+            echo "PR Number: ${PR_NUMBER}"
+
+            gh pr merge "${PR_NUMBER}" \
+              --repo "${{ env.GITOPS_REPO }}" \
+              --merge \
+              --auto
+
+      # ========================================================================
+      # Stage 25 — Stop
       # ========================================================================
       - name: Stage 24 — Stop
         run: |
