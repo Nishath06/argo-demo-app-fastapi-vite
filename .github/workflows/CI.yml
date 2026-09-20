@@ -277,12 +277,14 @@ jobs:
       # Stage 18 — Clone GitOps Repository
       # ========================================================================
       - name: Stage 18 — Clone GitOps Repository
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          echo "Cloning GitOps infrastructure repository: ${{ env.GITOPS_REPO }}..."
-          rm -rf infra-repo
-          git clone --depth 1 --branch "${{ env.BASE_BRANCH }}" \
-            "https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ env.GITOPS_REPO }}.git" infra-repo
+          echo "Cloning GitOps repository..."
+
+          git clone \
+          "https://x-access-token:${GH_PAT}@github.com/${{ env.GITOPS_REPO }}.git" \
+          infra-repo
 
       # ========================================================================
       # Stage 19 — Update Backend Deployment Manifest
@@ -345,12 +347,18 @@ jobs:
       # ========================================================================
       # Stage 22 — Push feature branch
       # ========================================================================
-      - name: Stage 22 — Push feature branch
-        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch') && env.CHANGES_COMMITTED == 'true'
+      - name: Stage 22 — Push Feature Branch
         working-directory: infra-repo
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           BRANCH_NAME="update/image-${{ env.IMAGE_TAG }}"
-          echo "Pushing feature branch ${BRANCH_NAME} to GitOps repository..."
+
+          echo "Updating authenticated remote..."
+
+          git remote set-url origin \
+          "https://x-access-token:${GH_PAT}@github.com/${{ env.GITOPS_REPO }}.git"
+  
           git push origin "${BRANCH_NAME}" --force
 
       # ========================================================================
