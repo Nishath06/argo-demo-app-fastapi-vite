@@ -289,40 +289,47 @@ jobs:
       # ========================================================================
       # Stage 19 — Update Backend Deployment Manifest
       # ========================================================================
-      - name: Stage 19 — Update Backend Deployment Manifest
+      - name: Stage 19 — Update Backend Kustomization
         if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         working-directory: infra-repo
         env:
           BACKEND_IMAGE: ${{ env.BACKEND_IMAGE }}
           IMAGE_TAG: ${{ env.IMAGE_TAG }}
         run: |
-          echo "Updating backend deployment..."
+          echo "Updating backend kustomization image..."
 
           yq -i '
-            (.spec.template.spec.containers[] | select(.name == "backend")).image =
-            strenv(BACKEND_IMAGE) + ":" + strenv(IMAGE_TAG)
-          ' "${{ env.BACKEND_MANIFEST }}"
+            (.images[] | select(.name == "BACKEND_IMAGE")).newName = strenv(BACKEND_IMAGE) |
+            (.images[] | select(.name == "BACKEND_IMAGE")).newTag = strenv(IMAGE_TAG)
+          ' apps/backend/kustomization.yaml
 
-          git diff "${{ env.BACKEND_MANIFEST }}"
+          echo "Backend kustomization after update:"
+          cat apps/backend/kustomization.yaml
+
+          git diff apps/backend/kustomization.yaml
 
       # ========================================================================
-      # Stage 20 — Update Frontend Deployment Manifest
+      # Stage 20 — Update Frontend Kustomization Image Tag
       # ========================================================================
-      - name: Stage 20 — Update Frontend Deployment Manifest
+      - name: Stage 20 — Update Frontend Kustomization
         if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         working-directory: infra-repo
         env:
           FRONTEND_IMAGE: ${{ env.FRONTEND_IMAGE }}
           IMAGE_TAG: ${{ env.IMAGE_TAG }}
         run: |
-            echo "Updating frontend deployment..."
+          echo "Updating frontend kustomization image..."
 
-            yq -i '
-              (.spec.template.spec.containers[] | select(.name == "frontend")).image =
-              strenv(FRONTEND_IMAGE) + ":" + strenv(IMAGE_TAG)
-            ' "${{ env.FRONTEND_MANIFEST }}"
+          yq -i '
+            (.images[] | select(.name == "FRONTEND_IMAGE")).newName = strenv(FRONTEND_IMAGE) |
+            (.images[] | select(.name == "FRONTEND_IMAGE")).newTag = strenv(IMAGE_TAG)
+          ' apps/frontend/kustomization.yaml
 
-            git diff "${{ env.FRONTEND_MANIFEST }}"
+          echo "Frontend kustomization after update:"
+          cat apps/frontend/kustomization.yaml
+
+          git diff apps/frontend/kustomization.yaml
+          
       # ========================================================================
       # Stage 21 — Commit both manifest changes
       # ========================================================================
